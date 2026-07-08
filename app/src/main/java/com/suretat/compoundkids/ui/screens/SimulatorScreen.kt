@@ -188,9 +188,12 @@ private fun InputCard(
                 value    = initialAmount,
                 onValue  = onInitialChange,
                 min      = 0f,
-                max      = 10_000f,
-                steps    = 99,
-                display  = "%.0f €".format(initialAmount)
+                max      = 150_000f,   // plafond PEA
+                steps    = 299,        // pas de 500 €
+                display  = when {
+                    initialAmount >= 1000f -> "${"%.0f".format(initialAmount / 1000)} k€"
+                    else                   -> "%.0f €".format(initialAmount)
+                }
             )
             SliderRow(
                 label    = "Épargne par mois",
