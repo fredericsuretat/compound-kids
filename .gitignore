@@ -8,5 +8,7 @@
 .externalNativeBuild
 .cxx
 *.keystore
+*.jks
+keystore.properties
 apk/
 app/build/

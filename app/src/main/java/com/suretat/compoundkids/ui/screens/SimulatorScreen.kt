@@ -17,7 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.material.icons.Icons.Default
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +39,7 @@ fun SimulatorScreen(navController: NavController) {
     var initialAmount        by remember { mutableFloatStateOf(1000f) }
     var monthlyContribution  by remember { mutableFloatStateOf(50f) }
     var years                by remember { mutableIntStateOf(20) }
+    var bannerDismissed      by rememberSaveable { mutableStateOf(false) }
     var showReal             by remember { mutableStateOf(false) }
 
     val results      = remember(initialAmount, monthlyContribution, years) {
@@ -154,6 +162,21 @@ fun SimulatorScreen(navController: NavController) {
                     years    = years,
                     showReal = showReal
                 )
+            }
+
+            // ── Bannière Play Store ───────────────────────────────────
+            if (!bannerDismissed) {
+                item {
+                    val context = LocalContext.current
+                    RateBanner(
+                        onRate    = {
+                            bannerDismissed = true
+                            context.startActivity(Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=com.suretat.compoundkids")))
+                        },
+                        onDismiss = { bannerDismissed = true }
+                    )
+                }
             }
         }
     }
@@ -425,6 +448,52 @@ private fun ResultCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = scenario.color
                 )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun RateBanner(onRate: () -> Unit, onDismiss: () -> Unit) {
+    Card(
+        modifier  = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape     = RoundedCornerShape(12.dp),
+        colors    = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("🌱", fontSize = 22.sp)
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "L'app vous est utile ?",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Laissez un avis sur le Play Store, ça aide !",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            TextButton(onClick = onRate) {
+                Icon(Default.Star, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Noter", style = MaterialTheme.typography.labelMedium)
+            }
+            IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
+                Icon(Default.Close, contentDescription = "Fermer",
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
             }
         }
     }
