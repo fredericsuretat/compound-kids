@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -223,6 +225,9 @@ fun LearnScreen(navController: NavController) {
                 LearnCardView(card)
             }
 
+            // Support (demande au développeur, avec captures, et suivi de la réponse)
+            item { SupportEntry() }
+
             // Footer
             item {
                 Spacer(Modifier.height(8.dp))
@@ -314,4 +319,59 @@ private fun LearnCardView(card: LearnCard) {
             )
         }
     }
+}
+
+@Composable
+private fun SupportEntry() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var open by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var gate by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val version = androidx.compose.runtime.remember {
+        try { context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?" } catch (_: Exception) { "?" }
+    }
+    OutlinedButton(onClick = { gate = true }, modifier = Modifier.fillMaxWidth()) {
+        Text("✉️ Espace parents : contacter le support")
+    }
+    // Contrôle parental : le support demande un email et peut envoyer des photos, il est donc
+    // réservé à un adulte (app utilisée par des enfants).
+    if (gate) ParentGate(onPass = { gate = false; open = true }, onDismiss = { gate = false })
+    if (open) {
+        com.suretat.compoundkids.support.SupportScreen(
+            com.suretat.compoundkids.support.SupportConfig(
+                appKey = "compound-kids", appLabel = "Les sous qui poussent", versionName = version,
+            ),
+        ) { open = false }
+    }
+}
+
+@Composable
+private fun ParentGate(onPass: () -> Unit, onDismiss: () -> Unit) {
+    val a = androidx.compose.runtime.remember { (6..9).random() }
+    val b = androidx.compose.runtime.remember { (6..9).random() }
+    var answer by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    var wrong by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Espace parents") },
+        text = {
+            Column {
+                Text("Cette partie est réservée aux adultes. Combien font $a × $b ?")
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = answer,
+                    onValueChange = { answer = it.filter(Char::isDigit).take(3); wrong = false },
+                    singleLine = true,
+                    isError = wrong,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                    ),
+                )
+                if (wrong) Text("Ce n'est pas ça.", color = MaterialTheme.colorScheme.error)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { if (answer.toIntOrNull() == a * b) onPass() else wrong = true }) { Text("Valider") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } },
+    )
 }
