@@ -12,3 +12,6 @@
 keystore.properties
 apk/
 app/build/
+
+# Graphe de code Graphify (régénérable : graphify update .)
+graphify-out/
