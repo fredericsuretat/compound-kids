@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.suretat.compoundkids.data.*
@@ -252,6 +254,7 @@ private fun SliderRow(
     label: String, value: Float, onValue: (Float) -> Unit,
     min: Float, max: Float, steps: Int, display: String
 ) {
+    var editing by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -259,11 +262,38 @@ private fun SliderRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(label, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text  = display,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
+            // Valeur cliquable : saisie au clavier en plus de la glissière (ticket support #4).
+            TextButton(onClick = { editing = true }, contentPadding = PaddingValues(horizontal = 4.dp)) {
+                Text(
+                    text  = "$display ✏️",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        if (editing) {
+            var typed by remember { mutableStateOf("%.0f".format(value)) }
+            val parsed = typed.replace(',', '.').replace(" ", "").toFloatOrNull()
+            AlertDialog(
+                onDismissRequest = { editing = false },
+                title = { Text(label) },
+                text = {
+                    OutlinedTextField(
+                        value = typed,
+                        onValueChange = { typed = it.filter { c -> c.isDigit() || c == ',' || c == '.' } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        supportingText = { Text("Entre ${"%.0f".format(min)} et ${"%.0f".format(max)}") }
+                    )
+                },
+                confirmButton = {
+                    TextButton(enabled = parsed != null, onClick = {
+                        parsed?.let { onValue(it.coerceIn(min, max)) }
+                        editing = false
+                    }) { Text("OK") }
+                },
+                dismissButton = { TextButton(onClick = { editing = false }) { Text("Annuler") } }
             )
         }
         Slider(

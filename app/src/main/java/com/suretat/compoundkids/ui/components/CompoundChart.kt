@@ -130,13 +130,15 @@ fun CompoundChart(
             drawLine(axisColor, Offset(padL, padT + chartH), Offset(size.width - padR, padT + chartH), strokeWidth = 1.5f)
         }
 
-        // Legend row
-        Row(
+        // Légende : passe à la ligne quand elle ne tient pas, au lieu d'écraser le dernier libellé
+        // (« ETF Monde » s'écrivait verticalement, ticket support #4).
+        @OptIn(ExperimentalLayoutApi::class)
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             results.forEach { r ->
                 LegendItem(
@@ -162,7 +164,9 @@ private fun LegendItem(emoji: String, name: String, color: Color) {
         Text(
             text  = "$emoji $name",
             style = MaterialTheme.typography.labelSmall,
-            color = Color(0xFF424242)
+            color = Color(0xFF424242),
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
