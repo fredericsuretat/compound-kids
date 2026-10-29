@@ -43,6 +43,8 @@ fun SimulatorScreen(navController: NavController) {
     var years                by remember { mutableIntStateOf(20) }
     var bannerDismissed      by rememberSaveable { mutableStateOf(false) }
     var showReal             by remember { mutableStateOf(false) }
+    var showInfo             by remember { mutableStateOf(false) }
+    if (showInfo) AppInfoDialog { showInfo = false }
 
     val results      = remember(initialAmount, monthlyContribution, years) {
         simulateAll(initialAmount.toDouble(), monthlyContribution.toDouble(), years)
@@ -63,7 +65,10 @@ fun SimulatorScreen(navController: NavController) {
                 },
                 actions = {
                     IconButton(onClick = { navController.navigate("learn") }) {
-                        Icon(Icons.Default.Info, contentDescription = "Apprendre")
+                        Text("📚", fontSize = 20.sp)
+                    }
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(Icons.Default.Info, contentDescription = "Informations et mises à jour")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

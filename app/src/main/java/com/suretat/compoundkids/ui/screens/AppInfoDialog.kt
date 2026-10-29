@@ -58,13 +58,16 @@ private fun open(context: Context, url: String) =
     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 
 /**
- * Espace parents (derrière la question de calcul) : version, recherche de mise à jour, QR code et lien de la page
- * de l'application, contact du support. Pas d'installation par l'appli elle-même (règles Google Play) : la mise à
- * jour s'ouvre dans le Play Store si l'appli en vient, sinon l'APK se télécharge dans le navigateur.
+ * Bouton ℹ️ (demande de Fred : pas derrière l'Espace parents) : version, recherche de mise à jour, QR code et lien
+ * de la page de l'application. Pas d'installation par l'appli elle-même (règles Google Play) : la mise à jour
+ * s'ouvre dans le Play Store si l'appli en vient, sinon l'APK se télécharge dans le navigateur.
  */
 @Composable
-internal fun ParentsDialog(version: String, onSupport: () -> Unit, onDismiss: () -> Unit) {
+internal fun AppInfoDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
+    val version = remember {
+        try { context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?" } catch (_: Exception) { "?" }
+    }
     val scope = rememberCoroutineScope()
     var status by remember { mutableStateOf("") }
     var update by remember { mutableStateOf<Release?>(null) }
@@ -72,7 +75,7 @@ internal fun ParentsDialog(version: String, onSupport: () -> Unit, onDismiss: ()
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Espace parents") },
+        title = { Text("Informations") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Version installée : $version")
@@ -101,8 +104,6 @@ internal fun ParentsDialog(version: String, onSupport: () -> Unit, onDismiss: ()
                 TextButton(onClick = { open(context, SITE_PAGE) }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Text("frederic.suretat.com/les-sous-qui-poussent")
                 }
-                HorizontalDivider()
-                OutlinedButton(onClick = onSupport, modifier = Modifier.fillMaxWidth()) { Text("✉️ Contacter le support") }
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text("Fermer") } },
