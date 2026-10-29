@@ -329,12 +329,14 @@ private fun SupportEntry() {
     val version = androidx.compose.runtime.remember {
         try { context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?" } catch (_: Exception) { "?" }
     }
+    var parents by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     OutlinedButton(onClick = { gate = true }, modifier = Modifier.fillMaxWidth()) {
-        Text("✉️ Espace parents : contacter le support")
+        Text("👨‍👩‍👧 Espace parents : mises à jour, partage, support")
     }
-    // Contrôle parental : le support demande un email et peut envoyer des photos, il est donc
-    // réservé à un adulte (app utilisée par des enfants).
-    if (gate) ParentGate(onPass = { gate = false; open = true }, onDismiss = { gate = false })
+    // Contrôle parental : support (email, photos), liens externes et mises à jour sont réservés à un adulte
+    // (app utilisée par des enfants).
+    if (gate) ParentGate(onPass = { gate = false; parents = true }, onDismiss = { gate = false })
+    if (parents) ParentsDialog(version, onSupport = { parents = false; open = true }, onDismiss = { parents = false })
     if (open) {
         com.suretat.compoundkids.support.SupportScreen(
             com.suretat.compoundkids.support.SupportConfig(
