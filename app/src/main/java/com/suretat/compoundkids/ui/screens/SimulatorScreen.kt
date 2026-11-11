@@ -64,6 +64,9 @@ fun SimulatorScreen(navController: NavController) {
                     )
                 },
                 actions = {
+                    IconButton(onClick = { navController.navigate("money") }) {
+                        Text("💰", fontSize = 20.sp)
+                    }
                     IconButton(onClick = { navController.navigate("learn") }) {
                         Text("📚", fontSize = 20.sp)
                     }

@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.suretat.compoundkids.ui.screens.LearnScreen
+import com.suretat.compoundkids.ui.screens.MyMoneyScreen
 import com.suretat.compoundkids.ui.screens.SimulatorScreen
 import com.suretat.compoundkids.ui.theme.CompoundKidsTheme
 
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "simulator") {
                         composable("simulator") { SimulatorScreen(navController) }
                         composable("learn")     { LearnScreen(navController) }
+                        composable("money")     { MyMoneyScreen(navController) }
                     }
                 }
             }

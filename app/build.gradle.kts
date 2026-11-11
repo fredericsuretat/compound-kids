@@ -19,8 +19,8 @@ android {
         applicationId = "com.suretat.compoundkids"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.4.0"
+        versionCode = 7
+        versionName = "1.5.0"
     }
 
     signingConfigs {
@@ -70,6 +70,8 @@ dependencies {
     // Support in-app (tickets) : seul usage réseau de l'app.
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    testImplementation("junit:junit:4.13.2")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

@@ -345,7 +345,7 @@ private fun SupportEntry() {
 }
 
 @Composable
-private fun ParentGate(onPass: () -> Unit, onDismiss: () -> Unit) {
+internal fun ParentGate(onPass: () -> Unit, onDismiss: () -> Unit) {
     val a = androidx.compose.runtime.remember { (6..9).random() }
     val b = androidx.compose.runtime.remember { (6..9).random() }
     var answer by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
